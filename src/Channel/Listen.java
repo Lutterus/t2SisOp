@@ -145,6 +145,26 @@ public class Listen implements Runnable {
 				String answer = "Nao encontramos um servidor com o nome '" + clientSentence + "'";
 				return answer;
 			}
+		} else if (clientSentence.startsWith("/msg") && wordcount(clientSentence) >= 3) {
+			clientSentence = clientSentence.replace("/msg ", "");
+			String[] str_array = clientSentence.split(" ");
+			String userName = str_array[0];
+			if (channelFather.isInChannel(user, userName)) {
+				String answer = "";
+				for (int i = 1; i < str_array.length; i++) {
+					answer = answer + str_array[i] + " "; 
+				}
+				return "O usuario '" + userName + "' recebeu a mensagem => '" + answer + "'";
+			} else {
+				return "Nao foi possivel encontrar um usuario com o nome '" + userName + "'";
+			}
+			// String echo2 = str_array[1];
+			// System.out.println("echo1: " + echo1);
+			// System.out.println("echo2: "+ echo2);
+			// System.out.println("tamanho: " + str_array.length);
+			// if() {
+
+			// }
 		}
 
 		return "Comando usado de forma incorreta";

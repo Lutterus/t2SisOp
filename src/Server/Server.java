@@ -89,6 +89,7 @@ public class Server {
 		palavrasReservadas.addWord("/part");
 		palavrasReservadas.addWord("/names");
 		palavrasReservadas.addWord("/kick");
+		palavrasReservadas.addWord("/msg");
 
 	}
 }

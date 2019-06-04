@@ -85,5 +85,16 @@ public class Channel {
 	public void disconnectOne(Users user) {
 		userList.remove(user);
 	}
+
+	public boolean isInChannel(String userName) {
+		for (Users users : userList) {
+			if(users.getName()!=null && users.getName().contentEquals(userName)) {
+				return true;
+			}
+		}
+		
+		return false;
+		
+	}
 	
 }

@@ -36,11 +36,12 @@ public class Listen implements Runnable {
 			try {
 				echo = inFromServer.readLine();
 				String[] str_array = echo.split(":");
-				echo1 = str_array[0]; 
+				echo1 = str_array[0];
 				echo2 = str_array[1];
 			} catch (IOException e) {
 				System.err.println("Erro durante leitura da mensagem resposta do servidor");
 				e.printStackTrace();
+				echo = "/quit";
 			}
 			System.out.println(echo1 + ": " + echo2);
 		}

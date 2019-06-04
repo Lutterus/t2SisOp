@@ -39,7 +39,7 @@ public class Reply implements Runnable {
 				sentence = inFromUser.readLine();
 			} catch (IOException e) {
 				System.err.println("Erro durante leitura da mensagem digitada");
-				// e.printStackTrace();
+				sentence = "/quit";
 			}
 
 			/* envia uma mensagem digitada pelo usuário para o servidor */
@@ -47,7 +47,7 @@ public class Reply implements Runnable {
 				outToServer.writeBytes(sentence + '\n');
 			} catch (IOException e) {
 				System.err.println("Erro durante envio da mensagem ao servidor");
-				e.printStackTrace();
+				sentence = "/quit";
 			}
 		}
 
