@@ -96,5 +96,14 @@ public class Channel {
 		return false;
 		
 	}
+
+	public Users getUser(String userName) {
+		for (Users users : userList) {
+			if(users.getName()!=null && users.getName().contentEquals(userName)) {
+				return users;
+			}
+		}
+		return null;
+	}
 	
 }

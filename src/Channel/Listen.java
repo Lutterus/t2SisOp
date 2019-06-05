@@ -145,16 +145,26 @@ public class Listen implements Runnable {
 				String answer = "Nao encontramos um servidor com o nome '" + clientSentence + "'";
 				return answer;
 			}
-		} else if (clientSentence.startsWith("/msg") && wordcount(clientSentence) >= 3) {
+		} else if (clientSentence.startsWith("/msg") && wordcount(clientSentence) > 2) {
 			clientSentence = clientSentence.replace("/msg ", "");
 			String[] str_array = clientSentence.split(" ");
 			String userName = str_array[0];
 			if (channelFather.isInChannel(user, userName)) {
-				String answer = "";
+				String answer = "[MENSAGEM PRIVADA] ";
 				for (int i = 1; i < str_array.length; i++) {
 					answer = answer + str_array[i] + " "; 
 				}
-				return "O usuario '" + userName + "' recebeu a mensagem => '" + answer + "'";
+				String dest = answer + "\n";
+				Users tempUser = channelFather.getUserInChannel(user, userName);
+				Thread replier = new Thread(new ReplyOne(dest, tempUser, userName));
+				replier.start();
+				try {
+					replier.join();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return answer;
 			} else {
 				return "Nao foi possivel encontrar um usuario com o nome '" + userName + "'";
 			}

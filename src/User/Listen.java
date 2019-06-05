@@ -9,8 +9,8 @@ public class Listen implements Runnable {
 	private Socket socket;
 	private BufferedReader inFromServer;
 	private String echo;
-	private String echo1;
-	private String echo2;
+	private String owner;
+	private String msg = "";
 
 	public Listen(Socket clientSocket) {
 		this.socket = clientSocket;
@@ -36,14 +36,17 @@ public class Listen implements Runnable {
 			try {
 				echo = inFromServer.readLine();
 				String[] str_array = echo.split(":");
-				echo1 = str_array[0];
-				echo2 = str_array[1];
+				owner = str_array[0];
+				msg = "";
+				for (int i = 1; i < str_array.length; i++) {
+					msg = msg + str_array[i] + "";
+				}
 			} catch (IOException e) {
 				System.err.println("Erro durante leitura da mensagem resposta do servidor");
 				e.printStackTrace();
 				echo = "/quit";
 			}
-			System.out.println(echo1 + ": " + echo2);
+			System.out.println(owner + ": " + msg);
 		}
 	}
 }

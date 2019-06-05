@@ -104,4 +104,9 @@ public class ChannelList {
 		}
 		return false;
 	}
+
+	public Users getUserInChannel(Users user, String userName) {
+		Channel currentChannel = user.getCurrentChannel();
+		return currentChannel.getUser(userName);
+	}
 }
