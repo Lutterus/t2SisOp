@@ -82,7 +82,19 @@ public class Channel {
 		
 	}
 	
-	public void disconnectOne(Users user) {
+	public void disconnectOne(Users user, ReservedWords palavrasReservadas, ChannelList channelFather ) {
+		String clientSentence = "Nao e mais possivel mandar mensagens, pois voce foi removido pelo administrador deste canal";
+		Thread replier = new Thread(new ReplyOne(clientSentence, user, "SERVER"));
+		replier.start();
+		try {
+			replier.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		Thread listener = new Thread(new ListenServer(user.getSocket(), palavrasReservadas, channelFather));
+		listener.start();
+		user.setCurrentChannel(null);
 		userList.remove(user);
 	}
 

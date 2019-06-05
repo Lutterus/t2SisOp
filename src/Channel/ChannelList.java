@@ -45,14 +45,9 @@ public class ChannelList {
 	public boolean isAdm(String nameChannel, InetAddress connectionSocket) {
 		for (Channel channel : channelList) {
 			if (channel.getName().contentEquals(nameChannel)) {
-				System.out.println("nome correto: " + nameChannel);
 				if (channel.getAdm() == connectionSocket) {
-					System.out.println("e adm");
 					return true;
 				} else {
-					System.out.println("nao e adm");
-					System.out.println("ipnet: " + connectionSocket);
-					System.out.println("do canal: " + channel.getAdm());
 					return false;
 				}
 
@@ -81,6 +76,14 @@ public class ChannelList {
 		for (Channel channel : channelList) {
 			if (channel.getName().contentEquals(name)) {
 				channel.disconnectAll(palavrasReservadas, selfReference);
+			}
+		}
+	}
+	
+	public void disconnectOne(String name, Users user) {
+		for (Channel channel : channelList) {
+			if (channel.getName().contentEquals(name)) {
+				channel.disconnectOne(user, palavrasReservadas, selfReference);
 			}
 		}
 	}

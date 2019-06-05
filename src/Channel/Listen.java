@@ -152,7 +152,7 @@ public class Listen implements Runnable {
 			if (channelFather.isInChannel(user, userName)) {
 				String answer = "[MENSAGEM PRIVADA] ";
 				for (int i = 1; i < str_array.length; i++) {
-					answer = answer + str_array[i] + " "; 
+					answer = answer + str_array[i] + " ";
 				}
 				String dest = answer + "\n";
 				Users tempUser = channelFather.getUserInChannel(user, userName);
@@ -161,20 +161,22 @@ public class Listen implements Runnable {
 				try {
 					replier.join();
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				return answer;
 			} else {
 				return "Nao foi possivel encontrar um usuario com o nome '" + userName + "'";
 			}
-			// String echo2 = str_array[1];
-			// System.out.println("echo1: " + echo1);
-			// System.out.println("echo2: "+ echo2);
-			// System.out.println("tamanho: " + str_array.length);
-			// if() {
 
-			// }
+		} else if (clientSentence.startsWith("/kick") && wordcount(clientSentence) == 2) {
+			Channel currentChannel = user.getCurrentChannel();
+			if (channelFather.isAdm(currentChannel.getName(), connectionSocket.getInetAddress())) {
+				//Users tempUser = channelFather.getUserInChannel(user, userName);
+				System.out.println("foi");
+				return "Usuario removido do canal";
+			} else {
+				return "Nao e possivel executar esta acao, pois voce nao e o administrador deste canal";
+			}
 		}
 
 		return "Comando usado de forma incorreta";
