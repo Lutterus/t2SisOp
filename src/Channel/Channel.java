@@ -21,43 +21,43 @@ public class Channel {
 	public String getName() {
 		return name;
 	}
-	
+
 	public void addUser(Users user, ReservedWords palavrasReservadas) {
 		userList.add(user);
 		startThread(user, palavrasReservadas, father);
 	}
-	
+
 	public void removeUser(Users user) {
 		userList.remove(user);
 	}
-	
+
 	public void startThread(Users user, ReservedWords palavrasReservadas, ChannelList father) {
 		Thread listener = new Thread(new Listen(user, palavrasReservadas, father));
 		listener.start();
 	}
-	
-	public ArrayList<Users> getUsers(){
+
+	public ArrayList<Users> getUsers() {
 		return userList;
 	}
-	
+
 	public String getUsersString() {
 		String names = "Usuarios => ";
 		for (Users user : userList) {
-			if(user.getName()==null) {
+			if (user.getName() == null) {
 				names = names + ", anonymous";
-			}else {
-				names = names + ", "+ user.getName();
+			} else {
+				names = names + ", " + user.getName();
 			}
-			
+
 		}
-		
+
 		return names;
 	}
 
 	public ChannelList getFather() {
 		return father;
 	}
-	
+
 	public InetAddress getAdm() {
 		return adm;
 	}
@@ -77,13 +77,13 @@ public class Channel {
 			listener.start();
 			user.setCurrentChannel(null);
 		}
-		
+
 		userList.clear();
-		
+
 	}
-	
-	public void disconnectOne(Users user, ReservedWords palavrasReservadas, ChannelList channelFather ) {
-		String clientSentence = "Nao e mais possivel mandar mensagens, pois voce foi removido pelo administrador deste canal";
+
+	public void disconnectOne(Users user, ReservedWords palavrasReservadas, ChannelList channelFather) {
+		String clientSentence = "Nao e mais possivel mandar mensagens, pois voce foi removido pelo administrador deste canal \n";
 		Thread replier = new Thread(new ReplyOne(clientSentence, user, "SERVER"));
 		replier.start();
 		try {
@@ -100,22 +100,22 @@ public class Channel {
 
 	public boolean isInChannel(String userName) {
 		for (Users users : userList) {
-			if(users.getName()!=null && users.getName().contentEquals(userName)) {
+			if (users.getName() != null && users.getName().contentEquals(userName)) {
 				return true;
 			}
 		}
-		
+
 		return false;
-		
+
 	}
 
 	public Users getUser(String userName) {
 		for (Users users : userList) {
-			if(users.getName()!=null && users.getName().contentEquals(userName)) {
+			if (users.getName() != null && users.getName().contentEquals(userName)) {
 				return users;
 			}
 		}
 		return null;
 	}
-	
+
 }

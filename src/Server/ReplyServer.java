@@ -12,7 +12,7 @@ public class ReplyServer implements Runnable {
 	public ReplyServer(Socket connectionSocket, String echo) {
 		this.connectionSocket = connectionSocket;
 		outToClient = crateConnectionOut();
-		this.echo ="FROM SERVER: " + echo;
+		this.echo = "FROM SERVER: " + echo;
 	}
 
 	public DataOutputStream crateConnectionOut() {

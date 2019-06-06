@@ -13,30 +13,30 @@ public class Users {
 		this.socket = socket;
 		this.currentChannel = currentChannel;
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-	
+
 	public void setName(String name) {
 		this.name = name;
 	}
-	
+
 	public Socket getSocket() {
 		return socket;
 	}
-	
+
 	public void setCurrentChannel(Channel currentChannel) {
 		this.currentChannel = currentChannel;
 	}
-	
+
 	public Channel getCurrentChannel() {
 		return currentChannel;
 	}
-	
+
 	public String getIp() {
 		InetAddress IPAddress = socket.getInetAddress();
 		return IPAddress.getHostAddress();
 	}
-	
+
 }

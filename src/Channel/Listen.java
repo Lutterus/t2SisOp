@@ -74,7 +74,7 @@ public class Listen implements Runnable {
 						e.printStackTrace();
 					}
 					Channel currentChannel = user.getCurrentChannel();
-					currentChannel.disconnectOne(user);
+					currentChannel.disconnectOne(user, palavrasReservadas, channelFather);
 					user.setCurrentChannel(null);
 				} else {
 					clientSentence = clientSentence + '\n';
@@ -90,8 +90,29 @@ public class Listen implements Runnable {
 	private String executeCommand(String clientSentence, Socket connectionSocket) {
 		if (clientSentence.startsWith("/nick ") && wordcount(clientSentence) == 2) {
 			clientSentence = clientSentence.replace("/nick ", "");
-			user.setName(clientSentence);
-			return "NICK alterado com sucesso para ";
+			if (clientSentence.contentEquals("'anonymous'")) {
+				return "Nao e possivel alterar o nome de usuario para anonymous, visto que esta e uma palavra reservada";
+			} else if (channelFather.isNameFree(clientSentence) == false) {
+				return "Este nome esta sendo usado por outro usuario";
+			} else {
+				String alert = "";
+				if (user.getName() == null) {
+					alert = "O usuario 'anonymous' alterou seu 'NICK' para '" + clientSentence + "'\n";
+				} else {
+					alert = "O usuario " + user.getName() + " alterou seu 'NICK' para '" + clientSentence + "'\n";
+				}
+
+				Thread replier = new Thread(new ReplyAll(alert, user, "SERVER"));
+				replier.start();
+				try {
+					replier.join();
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				user.setName(clientSentence);
+				return "NICK alterado com sucesso para " + clientSentence;
+			}
 		} else if (clientSentence.startsWith("/join ") && wordcount(clientSentence) == 2) {
 			clientSentence = clientSentence.replace("/join ", "");
 			if (channelFather.channelExist(clientSentence)) {
@@ -122,7 +143,7 @@ public class Listen implements Runnable {
 			listener.start();
 			pending = false;
 			Channel currentChannel = user.getCurrentChannel();
-			currentChannel.disconnectOne(user);
+			currentChannel.disconnectOne(user, palavrasReservadas, channelFather);
 			user.setCurrentChannel(null);
 			return "/part";
 		} else if (clientSentence.contentEquals("/names")) {
@@ -168,10 +189,21 @@ public class Listen implements Runnable {
 				return "Nao foi possivel encontrar um usuario com o nome '" + userName + "'";
 			}
 
-		} else if (clientSentence.startsWith("/kick") && wordcount(clientSentence) == 2) {
-			Channel currentChannel = user.getCurrentChannel();
-			if (channelFather.isAdm(currentChannel.getName(), connectionSocket.getInetAddress())) {
-				//Users tempUser = channelFather.getUserInChannel(user, userName);
+		} else if (clientSentence.startsWith("/kick") && wordcount(clientSentence) == 3) {
+			String[] str_array = clientSentence.split(" ");
+			String channelName = str_array[1];
+			String userName = str_array[2];
+			if (channelFather.isAdm(channelName, connectionSocket.getInetAddress())) {
+				if (userName != "anonymous") {
+					if (channelFather.isInChannel(user, userName)) {
+						Users victim = channelFather.getUserInChannel(user, userName);
+						channelFather.disconnectOneByName(channelName, victim);
+					} else {
+						return "O usuario '" + userName + "' nao esta conectado no canal '" + channelName + "'";
+					}
+				}
+
+				// Users tempUser = channelFather.getUserInChannel(user, userName);
 				System.out.println("foi");
 				return "Usuario removido do canal";
 			} else {

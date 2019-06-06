@@ -55,7 +55,7 @@ public class ListenServer implements Runnable {
 				clientSentence = inFromClient.readLine();
 			} catch (IOException e) {
 				System.err.println("Erro ao ler a mensagem enviado pelo cliente");
-				pending=false;
+				pending = false;
 				e.printStackTrace();
 			}
 			if (palavrasReservadas.isReserved(clientSentence)) {
@@ -70,12 +70,12 @@ public class ListenServer implements Runnable {
 				/* Envia mensagem para o cliente */
 				replier.start();
 			} else {
-				if(clientSentence.contentEquals("/quit")) {
+				if (clientSentence.contentEquals("/quit")) {
 					pending = false;
-				}else {
+				} else {
 					clientSentence = standardMsg(clientSentence);
 				}
-				
+
 				/* Exibe, IP:port => msg */
 				System.out.println(IPAddress.getHostAddress() + ":" + port + " => " + clientSentence);
 
@@ -117,19 +117,19 @@ public class ListenServer implements Runnable {
 		} else if (clientSentence.contentEquals("/list")) {
 			String answer = channels.toString();
 			return answer;
-		} else if(clientSentence.startsWith("/remove") && wordcount(clientSentence) == 2) {
+		} else if (clientSentence.startsWith("/remove") && wordcount(clientSentence) == 2) {
 			clientSentence = clientSentence.replace("/remove ", "");
 			if (channels.channelExist(clientSentence)) {
-				if(channels.isAdm(clientSentence, connectionSocket.getInetAddress())) {
-					String answer = "Canal Removido";	
+				if (channels.isAdm(clientSentence, connectionSocket.getInetAddress())) {
+					String answer = "Canal Removido";
 					channels.disconnectAll(clientSentence);
 					channels.removeChannel(clientSentence);
 					return answer;
-				}else {
+				} else {
 					String answer = "Nao e possivel executar esta acao, pois voce nao e o administrador deste canal";
 					return answer;
 				}
-				
+
 			} else {
 				String answer = "Nao encontramos um servidor com o nome '" + clientSentence + "'";
 				return answer;

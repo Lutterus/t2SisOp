@@ -79,8 +79,8 @@ public class ChannelList {
 			}
 		}
 	}
-	
-	public void disconnectOne(String name, Users user) {
+
+	public void disconnectOneByName(String name, Users user) {
 		for (Channel channel : channelList) {
 			if (channel.getName().contentEquals(name)) {
 				channel.disconnectOne(user, palavrasReservadas, selfReference);
@@ -111,5 +111,18 @@ public class ChannelList {
 	public Users getUserInChannel(Users user, String userName) {
 		Channel currentChannel = user.getCurrentChannel();
 		return currentChannel.getUser(userName);
+	}
+
+	public boolean isNameFree(String name) {
+		for (Channel channel : channelList) {
+			ArrayList<Users> tempChannelList = channel.getUsers();
+			for (Users user : tempChannelList) {
+				if (user.getName() != null && user.getName().contentEquals(name)) {
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 }
