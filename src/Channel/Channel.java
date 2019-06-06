@@ -73,7 +73,7 @@ public class Channel {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			Thread listener = new Thread(new ListenServer(user.getSocket(), palavrasReservadas, channelFather));
+			Thread listener = new Thread(new ListenServer(user.getSocket(), palavrasReservadas, channelFather, user));
 			listener.start();
 			user.setCurrentChannel(null);
 		}
@@ -82,8 +82,13 @@ public class Channel {
 
 	}
 
-	public void disconnectOne(Users user, ReservedWords palavrasReservadas, ChannelList channelFather) {
-		String clientSentence = "Nao e mais possivel mandar mensagens, pois voce foi removido pelo administrador deste canal \n";
+	public void disconnectOne(Users user, ReservedWords palavrasReservadas, ChannelList channelFather, int type) {
+		String clientSentence = "";
+		if (type == 0) {
+			clientSentence = "Nao e mais possivel mandar mensagens, pois voce foi removido pelo administrador deste canal \n";
+		} else {
+			clientSentence = "Voce desconectou do canal\n";
+		}
 		Thread replier = new Thread(new ReplyOne(clientSentence, user, "SERVER"));
 		replier.start();
 		try {
@@ -92,7 +97,7 @@ public class Channel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		Thread listener = new Thread(new ListenServer(user.getSocket(), palavrasReservadas, channelFather));
+		Thread listener = new Thread(new ListenServer(user.getSocket(), palavrasReservadas, channelFather, user));
 		listener.start();
 		user.setCurrentChannel(null);
 		userList.remove(user);

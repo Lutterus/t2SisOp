@@ -14,11 +14,11 @@ public class ChannelList {
 		this.palavrasReservadas = palavrasReservadas;
 	}
 
-	public void transferUser(String channelName, Socket connectionSocket) {
+	public void transferUser(String channelName, Socket connectionSocket, Users user) {
 		for (Channel channel : channelList) {
 			if (channel.getName().contentEquals(channelName)) {
-				Users temp = new Users(null, connectionSocket, channel);
-				channel.addUser(temp, palavrasReservadas);
+				user.setCurrentChannel(channel);
+				channel.addUser(user, palavrasReservadas);
 			}
 		}
 	}
@@ -80,10 +80,10 @@ public class ChannelList {
 		}
 	}
 
-	public void disconnectOneByName(String name, Users user) {
+	public void disconnectOneByName(String name, Users user, int type) {
 		for (Channel channel : channelList) {
 			if (channel.getName().contentEquals(name)) {
-				channel.disconnectOne(user, palavrasReservadas, selfReference);
+				channel.disconnectOne(user, palavrasReservadas, selfReference, type);
 			}
 		}
 	}

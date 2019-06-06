@@ -27,20 +27,10 @@ public class Server {
 			Socket connectionSocket = createSocket(welcomeSocket);
 
 			/* Cria uma stream de entrada (e saida) para receber os dados do cliente */
-			Thread listener = new Thread(new ListenServer(connectionSocket, palavrasReservadas, channels));
+			Thread listener = new Thread(new ListenServer(connectionSocket, palavrasReservadas, channels, null));
 
 			/* Aguarda o envio de uma mensagem (e envia para o cliente) */
 			listener.start();
-			/*
-			 * try { listener.join(); } catch (InterruptedException e) {
-			 * System.err.println("Erro ao esperar pela thread listener");
-			 * e.printStackTrace(); }
-			 * 
-			 * Encerra socket do cliente try { System.out.println("fechou conexao");
-			 * connectionSocket.close(); } catch (IOException e) {
-			 * System.err.println("Erro ao tentar encerrar a conexÃ£o do servidor");
-			 * e.printStackTrace(); }
-			 */
 		}
 	}
 

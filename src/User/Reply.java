@@ -9,7 +9,7 @@ import java.net.Socket;
 public class Reply implements Runnable {
 	private Socket socket;
 	private DataOutputStream outToServer;
-	private String sentence;
+	private String sentence = ";";;
 	private BufferedReader inFromUser;
 
 	public Reply(Socket clientSocket) {
@@ -32,7 +32,6 @@ public class Reply implements Runnable {
 	@Override
 	public void run() {
 		System.out.print("Conectado");
-		sentence = ";";
 		while (sentence.contentEquals("/quit") == false) {
 			/* Lê uma mensagem digitada pelo usuário */
 			try {

@@ -21,6 +21,7 @@ public class ReplyServer implements Runnable {
 			outToClient = new DataOutputStream(connectionSocket.getOutputStream());
 			return outToClient;
 		} catch (IOException e) {
+			closeConnection();
 			System.err.println("Erro durante criação da stream de saida de dados");
 			e.printStackTrace();
 		}
@@ -34,7 +35,18 @@ public class ReplyServer implements Runnable {
 		} catch (IOException e) {
 			System.err.println("Erro na thread de envio, ao enviar a mensagem para o cliente");
 			e.printStackTrace();
+			closeConnection();
 		}
+	}
+
+	private void closeConnection() {
+		try {
+			connectionSocket.close();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 	}
 
 }

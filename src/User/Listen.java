@@ -8,7 +8,7 @@ import java.net.Socket;
 public class Listen implements Runnable {
 	private Socket socket;
 	private BufferedReader inFromServer;
-	private String echo;
+	private String echo = ";";;
 	private String owner;
 	private String msg = "";
 
@@ -30,7 +30,6 @@ public class Listen implements Runnable {
 
 	@Override
 	public void run() {
-		echo = ";";
 		while (echo.contains("/quit") == false) {
 			/* recebe uma mensagem digitada pelo usuario para o servidor */
 			try {
