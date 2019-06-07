@@ -83,9 +83,15 @@ public class ChannelList {
 	public void disconnectOneByName(String name, Users user, int type) {
 		for (Channel channel : channelList) {
 			if (channel.getName().contentEquals(name)) {
-				channel.disconnectOne(user, palavrasReservadas, selfReference, type);
+				channel.disconnectOne(user, palavrasReservadas, selfReference);
 			}
 		}
+	}
+	
+	public void disconnectOne(Users user, int type) {
+		Channel channel = user.getCurrentChannel();
+		System.out.println("nome do canal " + user.getCurrentChannel().getName());
+		channel.disconnectOne(user, palavrasReservadas, selfReference);
 	}
 
 	public void removeChannel(String nameChannel) {
@@ -124,5 +130,23 @@ public class ChannelList {
 		}
 
 		return true;
+	}
+	
+	public void disconnectAnonymous(Users adm) {
+		adm.getCurrentChannel().cleanAnonymous(palavrasReservadas, selfReference);
+	}
+	
+	public void cleanChannels(Users user) {
+		ArrayList<String> channelsName = new ArrayList<String>();
+		for (Channel channel : channelList) {
+			if(channel.getAdm()==user.getSocket().getInetAddress()) {
+				disconnectAll(channel.getName());
+				channelsName.add(channel.getName());
+			}
+		}
+		
+		for (String string : channelsName) {
+			removeChannel(string);
+		}
 	}
 }

@@ -3,18 +3,16 @@ package Server;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetAddress;
 import java.net.Socket;
 
 import Channel.ChannelList;
-import Channel.ReplyAll;
 import Channel.ReservedWords;
 import Channel.Users;
 
 public class ListenServer implements Runnable {
 	private Socket connectionSocket;
 	private BufferedReader inFromClient;
-	private String clientSentence;
+	private String clientSentence = "";
 	private ReservedWords palavrasReservadas;
 	private ChannelList channels;
 	private boolean pending = true;
@@ -25,12 +23,12 @@ public class ListenServer implements Runnable {
 		inFromClient = createStreamIn();
 		this.palavrasReservadas = palavrasReservadas;
 		this.channels = channels;
-		if(user==null) {
+		if (user == null) {
 			this.user = createUser();
-		}else {
+		} else {
 			this.user = user;
 		}
-		
+
 	}
 
 	private Users createUser() {
@@ -45,18 +43,12 @@ public class ListenServer implements Runnable {
 		} catch (IOException e) {
 			System.err.println("Erro durante criação da stream de entrada de dados");
 			e.printStackTrace();
-			try {
-				connectionSocket.close();
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
 		}
 		return inFromClient;
 	}
 
 	@Override
 	public void run() {
-		clientSentence = ";";
 		while (pending == true) {
 			try {
 				clientSentence = inFromClient.readLine();
@@ -64,34 +56,26 @@ public class ListenServer implements Runnable {
 				System.err.println("Erro ao ler a mensagem enviado pelo cliente");
 				pending = false;
 				e.printStackTrace();
-				closeConnection();
+				cleanUserChannels();
 			}
 			if (palavrasReservadas.isReserved(clientSentence)) {
 				clientSentence = executeCommand(clientSentence, connectionSocket);
-				clientSentence = clientSentence + '\n';
+				clientSentence = clientSentence + "\n";
 				Thread replier = new Thread(new ReplyServer(connectionSocket, clientSentence));
 				replier.start();
 			} else {
 				if (clientSentence.contentEquals("/quit")) {
 					pending = false;
+					cleanUserChannels();
 				} else {
 					clientSentence = standardMsg(clientSentence);
 				}
-				clientSentence = clientSentence + '\n';
+				clientSentence = clientSentence + "\n";
 
 				Thread replier = new Thread(new ReplyServer(connectionSocket, clientSentence));
 				replier.start();
 
 			}
-		}
-
-	}
-
-	private void closeConnection() {
-		try {
-			connectionSocket.close();
-		} catch (IOException e) {
-			e.printStackTrace();
 		}
 
 	}
@@ -158,13 +142,19 @@ public class ListenServer implements Runnable {
 	private String commandCreate() {
 		clientSentence = clientSentence.replace("/create ", "");
 		if (channels.channelExist(clientSentence)) {
-			String answer = "Já existe um canal com o nome '" + clientSentence + "'";
+			String answer = "Ja existe um canal com o nome '" + clientSentence + "'";
 			return answer;
 		} else {
-			channels.addChannel(clientSentence, connectionSocket.getInetAddress());
-			String answer = "Criado um canal com o nome '" + clientSentence + "', para o acessar digite '/join "
-					+ clientSentence + "'";
-			return answer;
+			if(user.getName()==null) {
+				String answer = "Para criar um canal, primeiro voce devera usar o comando '/nick' e criar um nome para que possamos reconhece-lo";
+				return answer;
+			}else {
+				channels.addChannel(clientSentence, connectionSocket.getInetAddress());
+				String answer = "Criado um canal com o nome '" + clientSentence + "', para o acessar digite '/join "
+						+ clientSentence + "'";
+				return answer;
+			}
+			
 		}
 	}
 
@@ -198,5 +188,9 @@ public class ListenServer implements Runnable {
 				+ "'/list' para ver a lista de canais, " + "'/join' para entrar em um canal ou "
 				+ "'/create' para criar um canal";
 		return clientSentence;
+	}
+	
+	private void cleanUserChannels() {
+		channels.cleanChannels(user);		
 	}
 }

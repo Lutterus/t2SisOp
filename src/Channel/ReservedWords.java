@@ -21,4 +21,8 @@ public class ReservedWords {
 		}
 		return false;
 	}
+	
+	public int size() {
+		return palavrasReservadas.size();
+	}
 }

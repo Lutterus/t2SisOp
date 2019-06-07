@@ -42,6 +42,7 @@ public class Listen implements Runnable {
 			} catch (IOException e) {
 				System.err.println("Erro ao ler a mensagem enviado pelo cliente");
 				pending = false;
+				cleanUserChannels();
 				e.printStackTrace();
 				
 			}
@@ -52,7 +53,7 @@ public class Listen implements Runnable {
 			} else {
 				if (clientSentence.contentEquals("/quit")) {
 					pending = false;
-					clientSentence = clientSentence + '\n';
+					clientSentence = clientSentence + "\n";
 					Thread replier = new Thread(new ReplyOne(clientSentence, user, "SERVER"));
 					replier.start();
 					try {
@@ -62,19 +63,31 @@ public class Listen implements Runnable {
 						e.printStackTrace();
 					}
 					Channel currentChannel = user.getCurrentChannel();
-					currentChannel.disconnectOne(user, palavrasReservadas, channelFather, 1);
+					currentChannel.disconnectOne(user, palavrasReservadas, channelFather);
 					user.setCurrentChannel(null);
-				}else if(clientSentence.contentEquals("/part")) {
-					break;
 				} else {
-					clientSentence = clientSentence + '\n';
-					Thread replier = new Thread(new ReplyAll(clientSentence, user, user.getName()));
-					replier.start();
+					if (channelFather.isAdm(user.getCurrentChannel().getName(), connectionSocket.getInetAddress())) {
+						clientSentence = clientSentence + "\n";
+						user.setLastMessage(clientSentence);
+						Thread replier = new Thread(new ReplyAll(clientSentence, user, "*"+user.getName()));
+						replier.start();
+					}else {
+						clientSentence = clientSentence + "\n";
+						user.setLastMessage(clientSentence);
+						Thread replier = new Thread(new ReplyAll(clientSentence, user, user.getName()));
+						replier.start();
+					}
+					
 				}
 
 			}
 		}
 
+	}
+
+	private void cleanUserChannels() {
+		channelFather.cleanChannels(user);
+		
 	}
 
 	private String executeCommand(Socket connectionSocket) {
@@ -124,18 +137,29 @@ public class Listen implements Runnable {
 		String channelName = str_array[1];
 		String userName = str_array[2];
 		if (channelFather.isAdm(channelName, connectionSocket.getInetAddress())) {
-			if (userName != "anonymous") {
+			if (userName.contentEquals("anonymous")==false) {
 				if (channelFather.isInChannel(user, userName)) {
 					Users victim = channelFather.getUserInChannel(user, userName);
 					channelFather.disconnectOneByName(channelName, victim, 0);
+					return "Usuario removido do canal";
 				} else {
 					return "O usuario '" + userName + "' nao esta conectado no canal '" + channelName + "'";
 				}
+			}else {
+				channelFather.disconnectAnonymous(user);
+				return "Por falta de tempo para implementar um algoritmo mais eficiente, este comando 'kickou' TODOS os usuarios sem nome";
 			}
-			return "Usuario removido do canal";
+			
 		} else {
 			return "Nao e possivel executar esta acao, pois voce nao e o administrador deste canal";
 		}
+	}
+	
+	private String commandPart() {
+		clientSentence = "Voce desconectou do canal";
+		channelFather.disconnectOne(user, 1);
+		pending = false;
+		return "Voce desconectou do canal";
 	}
 
 	private String commandMSG() {
@@ -147,9 +171,10 @@ public class Listen implements Runnable {
 			for (int i = 1; i < str_array.length; i++) {
 				answer = answer + str_array[i] + " ";
 			}
-			String dest = answer + "\n";
+			String message = answer + "\n";
+			user.setLastMessage(message);
 			Users tempUser = channelFather.getUserInChannel(user, userName);
-			Thread replier = new Thread(new ReplyOne(dest, tempUser, userName));
+			Thread replier = new Thread(new ReplyOne(message, tempUser, userName));
 			replier.start();
 			try {
 				replier.join();
@@ -186,15 +211,6 @@ public class Listen implements Runnable {
 		}
 	}
 
-	private String commandPart() {
-		Thread listener = new Thread(new ListenServer(connectionSocket, palavrasReservadas, channelFather, user));
-		listener.start();
-		Channel currentChannel = user.getCurrentChannel();
-		currentChannel.disconnectOne(user, palavrasReservadas, channelFather, 1);
-		user.setCurrentChannel(null);
-		return "/part";
-	}
-
 	private String commandList() {
 		String answer = channelFather.toString();
 		return answer;
@@ -203,13 +219,18 @@ public class Listen implements Runnable {
 	private String commandCreate() {
 		clientSentence = clientSentence.replace("/create ", "");
 		if (channelFather.channelExist(clientSentence)) {
-			String answer = "Já existe um canal com o nome '" + clientSentence + "'";
+			String answer = "Ja existe um canal com o nome '" + clientSentence + "'";
 			return answer;
 		} else {
-			channelFather.addChannel(clientSentence, connectionSocket.getInetAddress());
-			String answer = "Criado um canal com o nome '" + clientSentence + "', para o acessar digite '/join "
-					+ clientSentence + "'";
-			return answer;
+			if(user.getName()==null) {
+				String answer = "Para criar um canal, primeiro voce devera usar o comando '/nick' e criar um nome para que possamos reconhece-lo";
+				return answer;
+			}else {
+				channelFather.addChannel(clientSentence, connectionSocket.getInetAddress());
+				String answer = "Criado um canal com o nome '" + clientSentence + "', para o acessar digite '/join "
+						+ clientSentence + "'";
+				return answer;
+			}
 		}
 	}
 
@@ -254,7 +275,7 @@ public class Listen implements Runnable {
 
 	}
 
-	static int wordcount(String string) {
+	public int wordcount(String string) {
 		int count = 0;
 
 		char ch[] = new char[string.length()];

@@ -17,6 +17,8 @@ public class ReplyOne implements Runnable {
 	private String setEcho(String echo, String name) {
 		if (name == null) {
 			echo = "anonymous: " + echo;
+		} else if (name.contentEquals("SERVER")) {
+			echo = "FROM SERVER: " + echo;
 		} else {
 			echo = name + ": " + echo;
 		}

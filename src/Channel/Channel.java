@@ -64,7 +64,7 @@ public class Channel {
 
 	public void disconnectAll(ReservedWords palavrasReservadas, ChannelList channelFather) {
 		for (Users user : userList) {
-			String clientSentence = "Nao e mais possivel mandar mensagens, pois estre canal foi excluido pelo administrador";
+			String clientSentence = "Nao e mais possivel mandar mensagens, pois este canal foi excluido pelo administrador \n";
 			Thread replier = new Thread(new ReplyAll(clientSentence, user, "SERVER"));
 			replier.start();
 			try {
@@ -76,19 +76,16 @@ public class Channel {
 			Thread listener = new Thread(new ListenServer(user.getSocket(), palavrasReservadas, channelFather, user));
 			listener.start();
 			user.setCurrentChannel(null);
+			user.setLastMessage(null);
 		}
 
 		userList.clear();
 
 	}
 
-	public void disconnectOne(Users user, ReservedWords palavrasReservadas, ChannelList channelFather, int type) {
+	public void disconnectOne(Users user, ReservedWords palavrasReservadas, ChannelList channelFather) {
 		String clientSentence = "";
-		if (type == 0) {
-			clientSentence = "Nao e mais possivel mandar mensagens, pois voce foi removido pelo administrador deste canal \n";
-		} else {
-			clientSentence = "Voce desconectou do canal\n";
-		}
+		clientSentence = "Voce foi desconectado deste canal \n";
 		Thread replier = new Thread(new ReplyOne(clientSentence, user, "SERVER"));
 		replier.start();
 		try {
@@ -97,9 +94,11 @@ public class Channel {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+
 		Thread listener = new Thread(new ListenServer(user.getSocket(), palavrasReservadas, channelFather, user));
 		listener.start();
 		user.setCurrentChannel(null);
+		user.setLastMessage(null);
 		userList.remove(user);
 	}
 
@@ -121,6 +120,16 @@ public class Channel {
 			}
 		}
 		return null;
+	}
+	
+	public void cleanAnonymous(ReservedWords palavrasReservadas, ChannelList channelFather) {
+		ArrayList<Users> temp = new ArrayList<Users>();
+		temp.addAll(userList);
+		for (Users user : temp) {
+			if(user.getName()==null) {
+				disconnectOne(user, palavrasReservadas, channelFather);
+			}
+		}
 	}
 
 }

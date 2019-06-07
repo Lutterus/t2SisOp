@@ -7,6 +7,7 @@ public class Users {
 	private String name;
 	private Socket socket;
 	private Channel currentChannel;
+	private String lastMessage;
 
 	public Users(String name, Socket socket, Channel currentChannel) {
 		this.name = null;
@@ -37,6 +38,14 @@ public class Users {
 	public String getIp() {
 		InetAddress IPAddress = socket.getInetAddress();
 		return IPAddress.getHostAddress();
+	}
+
+	public String getLastMessage() {
+		return lastMessage;
+	}
+
+	public void setLastMessage(String lastMessage) {
+		this.lastMessage = lastMessage;
 	}
 
 }
